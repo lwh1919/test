@@ -70,7 +70,7 @@ jobs:
            DOKPLOY_APPLICATION_ID: ${{ secrets.API_TEST_APP_ID }}
          run: |
            curl -X 'POST' \
-             "https://${DOKPLOY_DOMAIN}/api/compose.deploy" \
+             "http://${DOKPLOY_DOMAIN}/api/compose.deploy" \
              -H 'accept: application/json' \
              -H "x-api-key: ${DOKPLOY_AUTH_TOKEN}" \
              -H 'Content-Type: application/json' \
