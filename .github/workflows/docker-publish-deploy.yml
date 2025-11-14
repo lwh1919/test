@@ -69,10 +69,37 @@ jobs:
            DOKPLOY_AUTH_TOKEN: ${{ secrets.DOKPLOY_AUTH_TOKEN }}
            DOKPLOY_APPLICATION_ID: ${{ secrets.API_TEST_APP_ID }}
          run: |
-           curl -X 'POST' \
+           echo "🚀 Starting Dokploy deployment..."
+           echo "📍 Dokploy Domain: ${DOKPLOY_DOMAIN}"
+           echo "🆔 Application ID: ${DOKPLOY_APPLICATION_ID}"
+           
+           # 调用 Dokploy API 部署
+           HTTP_CODE=$(curl -s -o /tmp/dokploy_response.txt -w "%{http_code}" -X 'POST' \
              "http://${DOKPLOY_DOMAIN}/api/compose.deploy" \
              -H 'accept: application/json' \
              -H "x-api-key: ${DOKPLOY_AUTH_TOKEN}" \
              -H 'Content-Type: application/json' \
-             -d "{\"composeId\":\"${DOKPLOY_APPLICATION_ID}\"}"
+             -d "{\"composeId\":\"${DOKPLOY_APPLICATION_ID}\"}")
+           
+           echo "📋 Response Status Code: ${HTTP_CODE}"
+           echo "📄 Response Body:"
+           cat /tmp/dokploy_response.txt
+           echo ""
+           
+           # 检查响应状态码
+           if [ "${HTTP_CODE}" -ge 200 ] && [ "${HTTP_CODE}" -lt 300 ]; then
+             echo "✅ Dokploy deployment triggered successfully!"
+             echo "🔗 Check deployment status at: http://${DOKPLOY_DOMAIN}"
+             exit 0
+           elif [ "${HTTP_CODE}" -eq 401 ]; then
+             echo "❌ Authentication failed. Please check DOKPLOY_AUTH_TOKEN."
+             exit 1
+           elif [ "${HTTP_CODE}" -eq 404 ]; then
+             echo "❌ Application not found. Please check API_TEST_APP_ID."
+             exit 1
+           else
+             echo "❌ Dokploy deployment failed with HTTP status: ${HTTP_CODE}"
+             echo "Please check Dokploy logs for more details."
+             exit 1
+           fi
 
