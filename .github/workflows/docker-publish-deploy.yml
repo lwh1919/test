@@ -53,9 +53,11 @@ jobs:
           provenance: false
           tags: |
             ${{ secrets.CONTAINER_REGISTRY_HOST }}/workspace2/test1:latest
-          cache-from: type=gha,mode=min
-          cache-to: type=gha,mode=null
-          no-cache: false
+          # 使用 GitHub Actions 缓存（从缓存读取并写入缓存）
+          # mode=max: 存储所有层的缓存（包括未使用的层）
+          # mode=min: 只存储最终镜像的缓存（节省空间但缓存效果较差）
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
         timeout-minutes: 30
 
    # 可选：使用 Dokploy 自动部署
