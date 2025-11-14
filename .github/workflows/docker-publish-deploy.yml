@@ -40,6 +40,9 @@ jobs:
           registry: ${{ secrets.CONTAINER_REGISTRY_HOST }}
           username: ${{ secrets.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
+          logout: false
+        continue-on-error: false
+        timeout-minutes: 10
 
       - name: Build and push ${{ matrix.name }}
         uses: docker/build-push-action@v6
@@ -52,6 +55,8 @@ jobs:
             ${{ secrets.CONTAINER_REGISTRY_HOST }}/workspace2/test1:latest
           cache-from: type=gha,mode=min
           cache-to: type=gha,mode=null
+          no-cache: false
+        timeout-minutes: 30
 
    # 可选：使用 Dokploy 自动部署
   dokploy-deploy-api:
