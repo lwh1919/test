@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-cancel-job
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password  # 设置root用户的密码
+      MYSQL_DATABASE: your_database # 指定要创建的数据库名
+    ports:
+      - "3306:3306"
+    volumes:
+      # 初始化表结构
+      - /init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      # 持久化数据
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+volumes:
+  mysql_data:
+#重新测试记得  docker-compose down -v
